@@ -39,6 +39,7 @@
 #include	"linear_feedback_shift_register.h"
 #include	<iostream>
 #include	<bitset>
+#include	<string>
 #include	<cstdlib>
 
 /* Constructor and destructor. */

@@ -37,10 +37,110 @@
 #include	<iostream>
 #include	<cstdlib>
 #include	<bitset>
+#include	<getopt.h>
 #include	"linear_feedback_shift_register.h"
 
-int main()
+int main(int argc, char** argv)
 {
-	LFSR lfsr1;
-	return 0;
+	
+#ifdef  DEBUG
+	std::cout<<"\nEntering the main function...\n";
+#else      /* -----  not DEBUG  ----- */
+
+#endif     /* -----  not DEBUG  ----- */
+	if(argc < 2)
+	{
+		std::cout<<""
+			<<"\nHowdy! Fellow Human. For sake of your safety, you should give me your 64"
+			<<"\nSECRET key. Ok! We are not cool enough to provide you a secret interface."
+			<<"\nBut still !"
+			<<"\nUse --key or -k followed by key_value (e.g. 213412)."
+			<<"\n";
+	}
+
+	int c;
+	std::string strKey;
+	const char* strCKey;
+	unsigned long long int ulKey;
+	int do_help;
+	bool ifInvalid = false;
+	bool ifKey = false; // check if secret key is provided.
+	while(1)
+	{
+		int option_index = 0;
+		static struct option long_options[] = {
+			{"key", 		required_argument,		NULL,			'k'},
+			{"help", 		no_argument,					&do_help,	 1},
+			{0, 0, 0, 0}
+		};
+
+		c = getopt_long(argc, argv, "k:h", long_options, &option_index);
+		if(c == -1)
+			break;
+
+		switch(c) 
+		{
+			case 'k':
+				
+#ifdef  DEBUG
+				std::cout<<"\nFrom main() : -Option --key with value '"<<optarg<<"'\n";
+#else      /* -----  not DEBUG  ----- */
+
+#endif     /* -----  not DEBUG  ----- */
+				strKey = optarg;
+				strCKey = strKey.c_str(); // convert into C type string.
+				ulKey = strtoul(strCKey, NULL, 16); // convert key into unsigned long.
+				ifKey = true;
+				break;
+			
+			case 'h':
+				do_help =1;
+				break;
+
+			case 0:
+				break;
+
+			case ':':
+				std::cerr<<"option "<<argv[1]<<" requires an argument.\n";
+				ifInvalid = true;
+				break;
+
+			case '?':
+				break;
+			
+			default:
+				std::cerr<<"option "<<argv[1]<<" is invalid : ignored\n";
+				ifInvalid = true;
+				break;
+		}
+
+		/* we are asked to help this creature, so be it! */
+		if(ifInvalid == true || 1 == do_help)
+		{
+			std::cout<<""
+				<<"-------------------------------------------------------------------"
+				<<"\nUSAGE : "
+				<<"\n\t --key <key>"
+				<<"\n\t\tValue of the secret key (64 bit). Sorry, you have to type it here."
+				<<"\n\t --help"
+				<<"\n\t\tIf need help, you need to ask. Right?"
+				<<"\n-----------------------------------------------------------------";
+			return EXIT_FAILURE;
+			
+			/* Enough chatter! Let's fight. Like Alice and Jebberwalky . */
+
+		}
+		std::cout<<"i am here\n";
+	}
+	LFSR r1;
+
+	if(ifKey == true)
+	{
+		std::bitset<SIZE_REGISTER> key(ulKey);
+		std::cout<<"\nThe secret key is :"<<key;
+	}
+	
+	return EXIT_SUCCESS;
 }
+
+

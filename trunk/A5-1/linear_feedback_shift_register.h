@@ -41,6 +41,7 @@
 
 #include	<iostream>
 #include	<cstdlib>
+#include	<vector>
 #include	<bitset>
 
 #define SIZE_REGISTER		64     /* size of the registers. */
@@ -82,7 +83,6 @@ class LFSR
 
 
 		/* ====================  MUTATORS      ======================================= */
-
 		
 		/* 
 		 * ===  FUNCTION  ======================================================================
@@ -91,6 +91,38 @@ class LFSR
 		 * =====================================================================================
 		 */
 		bool setClockBit(size_t pos);
+	 
+		/* 
+		 * ===  FUNCTION  ======================================================================
+		 *         Name:  setSecretKey
+		 *  Description:  This will set the public member secretKey which can be used as a
+		 *  initial  state after mixing it with the content of the register. This is
+		 *  optional but we are going to use is anyway in our implementation.
+		 * =====================================================================================
+		 */
+		void setSecretKey(std::vector<bool> key);
+
+
+		/* 
+		 * ===  FUNCTION  ======================================================================
+		 *         Name:  initializeRegister
+		 *  Description:  This function will initialize a register for some clocks
+		 *  cycles. Typically in this case, this register will be initialized for 64
+		 *  times.
+		 * =====================================================================================
+		 */
+		void initializeRegister(std::size_t num);
+
+		
+		/* 
+		 * ===  FUNCTION  ======================================================================
+		 *         Name:  mixSecretKey
+		 *  Description:  This function will mix a 64 bit secret key with the
+		 *  content of a register. This is optional for our application.
+		 * =====================================================================================
+		 */
+
+		void mixSecretKey(void);
 
 		/* ====================  OPERATORS     ======================================= */
 
@@ -101,8 +133,11 @@ class LFSR
 
 	private:
 
-		std::size_t posClockBit; 											// position of the clock bit.
-		std::bitset<SIZE_REGISTER> Register; 					// A register.
+		std::size_t posClockBit; 											//! position of the clock bit.
+		std::bitset<SIZE_REGISTER> Register; 					//! A register.
+		std::vector<bool> secretKey;									/**! A secret key to mix with the content
+																										 of the register.*/
+
 
 }; /* -----  end of class LFSR  ----- */
 
