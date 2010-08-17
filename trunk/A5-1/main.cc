@@ -163,6 +163,7 @@ int main(int argc, char** argv)
 				<<"\nUSAGE : "
 				<<"\n\t --key <key>"
 				<<"\n\t\tValue of the secret key (64 bit). Sorry, you have to type it here."
+				<<"\n\t\te.g. 101010101010101001011111100101010100101 (in double quote as strings)."
 #if 0
 				<<"\n\t --poly1 poly1 e.g. 1 4 5 (in commas)"
 				<<"\n\t\tValue of the first polynomial."
