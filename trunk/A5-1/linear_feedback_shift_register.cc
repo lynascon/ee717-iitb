@@ -111,12 +111,21 @@ bool LFSR::getClockBit()
 
 #ifdef  DEBUG
 	std::cout<<"\nGetting the value of clock bit ...";
-#else      /* -----  not DEBUG  ----- */
-
 #endif     /* -----  not DEBUG  ----- */
 	return myRegister[posClockBit]; 
 }
- 
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getRegister
+ *  Description:  get the register
+ * =====================================================================================
+ */
+std::bitset<SIZE_REGISTER> LFSR::getRegister()
+{
+	return myRegister;
+}
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  initializeRegister()
@@ -130,8 +139,6 @@ void LFSR::initializeRegister()
 
 #ifdef  DEBUG
 	std::cout<<"\n Initializing a register ... \n";
-#else      /* -----  not DEBUG  ----- */
-
 #endif     /* -----  not DEBUG  ----- */
 
 	for(int i = 0; i < SIZE_REGISTER; i++)
@@ -148,35 +155,54 @@ void LFSR::initializeRegister()
  *  Description:  see the header file.
  * =====================================================================================
  */
-
-void LFSR::setSecretKey(std::bitset<SIZE_REGISTER> key)
+void LFSR::setSecretKey(std::bitset<SIZE_SECRET> thisKey)
 {
-
 #ifdef  DEBUG
 	std::cout << "\nMixing the secret key ... \n";
 #endif     /* -----  not DEBUG  ----- */
-	for(int i = 0; i < SIZE_REGISTER; i++)
+	for(int i = 0; i < (SIZE_SECRET); i++)
 	{
-		secretKey[i] = key[i];
+		secretKey[i] = thisKey[i];
+		totalKey[i] = thisKey[i];
 	}
 }
 
 /* 
  * ===  FUNCTION  ======================================================================
- *         Name:  mixSecretKey()
- *  Description:  This will mix the secret key in the register. Here we simply
- *  copy it into the register.
+ *         Name:  mixSecretiAndPublicKey()
+ *  Description:  This will mix the secret key with public key. It also sets the
+ *  public key of the class. Any scheme can be implemented. Here, we are augmenting 
+ *  one with another.
  * =====================================================================================
  */
+void LFSR::mixSecretAndPublicKey(std::bitset<SIZE_PUBLIC> thisKey)
+{
+#ifdef  DEBUG
+	std::cout<<"\nMixing secret and public keys ... \n";
+#endif     /* -----  not ->DEBUG  ----- */
+	for(int i =0 ; i < SIZE_PUBLIC; i++)
+	{
+		totalKey[SIZE_SECRET + i] = thisKey[i];
+		publicKey[i] = thisKey[i];
+	}
+}
 
-void LFSR::mixSecretKey()
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  mixKey
+ *  Description:  mix public and secret key to make a key. In this
+ *  implementation we are just augmenting. A sophisticated approach is
+ *  desirable.
+ * =====================================================================================
+ */
+void LFSR::mixKey()
 {
 #ifdef  DEBUG
 	std::cout << "\nMixing the secret key with the register.";
 #endif     /* -----  not DEBUG  ----- */
 	for(int i = 0; i < SIZE_REGISTER; i++)
 	{
-		myRegister[i] = secretKey[i];
+		myRegister[i] = totalKey[i];
 	}
 }
 
@@ -204,3 +230,50 @@ void LFSR::setPoly()
 	}
 }
 
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  majorityChecking
+ *  Description:  see the header file.
+ * =====================================================================================
+ */
+int LFSR::majorityChecking()
+{
+
+#ifdef  DEBUG
+	std::cout<<"\nGetting majority ... ";
+#else      /* -----  not DEBUG  ----- */
+
+#endif     /* -----  not DEBUG  ----- */
+
+	return 0;
+}
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  updateRegister
+ *  Description:  see the header file.
+ * =====================================================================================
+ */
+
+void LFSR::updateRegister()
+{
+#ifdef  DEBUG
+	std::cout<<"\nUpdating the register .. \n";
+#else      /* -----  not DEBUG  ----- */
+
+#endif /* -----  not DEBUG  ----- */
+	bool bit = myRegister[coeffPoly[0]];
+	for(int i = 0; i < 100; i++)
+	{
+		/* xor the location given by  poly */
+		for(unsigned int i = 1; i < coeffPoly.size(); i++)
+		{
+			bit = bit ^ myRegister[coeffPoly[i]];
+		}
+		/* shift everything one step left . */
+		myRegister <<= 1;
+		myRegister[0] = bit;
+	}
+}	

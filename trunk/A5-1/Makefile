@@ -6,7 +6,7 @@
 # Modification logs : 
 CC = g++
 CFLAGS = -c -g -Wall 
-MACRO =  -D DEBUG
+MACRO =  -D DEBUG_NOTHING # change to DEBUG if you want to see all the crap.
 VPATH = 
 OBJECTS = main.o linear_feedback_shift_register.o
 INCFLAGS = -I include 

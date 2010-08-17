@@ -44,9 +44,11 @@
 #include	<vector>
 #include	<bitset>
 
-#define SIZE_REGISTER		64     /* size of the registers. */
+#define SIZE_SECRET				64			/* size of the secret key */
+#define SIZE_PUBLIC				22			/* size of the public key. */
 
-
+#define SIZE_KEY					(SIZE_PUBLIC + SIZE_SECRET)     /* size of the registers. */
+#define SIZE_REGISTER   	144
 
 /*
  * =====================================================================================
@@ -89,6 +91,14 @@ class LFSR
 		 * =====================================================================================
 		 */
 		bool getClockBit();
+		 
+		/* 
+		 * ===  FUNCTION  ======================================================================
+		 *         Name:  getRegister
+		 *  Description:  get the register values.
+		 * =====================================================================================
+		 */
+		std::bitset<SIZE_REGISTER> getRegister();
 
 
 		/* ====================  MUTATORS      ======================================= */
@@ -109,7 +119,7 @@ class LFSR
 		 *  optional but we are going to use is anyway in our implementation.
 		 * =====================================================================================
 		 */
-		void setSecretKey(std::bitset<SIZE_REGISTER> key);
+		void setSecretKey(std::bitset<SIZE_SECRET> key);
 
 
 		/* 
@@ -131,8 +141,17 @@ class LFSR
 		 * =====================================================================================
 		 */
 
-		void mixSecretKey(void);
+		void mixSecretAndPublicKey(std::bitset<SIZE_PUBLIC> publicKey);
 
+
+
+		/* 
+		 * ===  FUNCTION  ======================================================================
+		 *         Name:  mixKey()
+		 *  Description:  mix public and secret key together.
+		 * =====================================================================================
+		 */
+		void mixKey();
 
 		/* 
 		 * ===  FUNCTION  ======================================================================
@@ -141,6 +160,28 @@ class LFSR
 		 * =====================================================================================
 		 */
 		void setPoly(void);
+
+
+		/* 
+		 * ===  FUNCTION  ======================================================================
+		 *         Name:  updateRegister
+		 *  Description:  This will update the register after running after pushing
+		 *  the key into it. For 100 steps.
+		 * =====================================================================================
+		 */
+		void updateRegister();
+
+		/* 
+		 * ===  FUNCTION  ======================================================================
+		 *         Name:  majorityChecking : NOT IMPLEMENTED.
+		 *  Description:  this will check which registers are to be clocked.
+		 *  Ret : 1, if 1 and 2 are clocked
+		 *      : 2, if 1 and 3 are clocked.
+		 *      : 3, if 2 and 3 are clocked.
+		 *      : 4, if 1, 2, 3 are clocked.
+		 * =====================================================================================
+		 */
+		int majorityChecking();
 
 		/* ====================  OPERATORS     ======================================= */
 
@@ -154,8 +195,9 @@ class LFSR
 		int posClockBit; 											//! position of the clock bit.
 		std::vector<unsigned int> coeffPoly;
 		std::bitset<SIZE_REGISTER> myRegister; 					//! A register.
-		std::bitset<SIZE_REGISTER> secretKey;									/**! A secret key to mix with the content
-																										 of the register.*/
+		std::bitset<SIZE_PUBLIC> publicKey;
+		std::bitset<SIZE_SECRET> secretKey;
+		std::bitset<SIZE_KEY> totalKey;
 
 
 }; /* -----  end of class LFSR  ----- */

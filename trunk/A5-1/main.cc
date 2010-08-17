@@ -40,6 +40,27 @@
 #include	<getopt.h>
 #include	"linear_feedback_shift_register.h"
 
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getMajority
+ *  Description:  implement the majority clock bit things in A5-1. See
+ *  implementation for more details.
+ * =====================================================================================
+ */
+int getMajority(LFSR *, LFSR *, LFSR *);
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getFrame
+ *  Description:  It is our final calculation for getting thee frame of 144
+ *  bits.
+ * =====================================================================================
+ */
+
+std::bitset<SIZE_REGISTER> getFrame2(LFSR *, LFSR *);
+std::bitset<SIZE_REGISTER> getFrame3(LFSR *, LFSR *, LFSR *);
+
 int main(int argc, char** argv)
 {
 	
@@ -213,28 +234,158 @@ int main(int argc, char** argv)
 #endif     /* -----  not DEBUG  ----- */
 
 	/* if secret key is given. Do the mixing.*/
-	if(ifKey == true)
+	if(ifKey == false)
 	{
-		std::bitset<SIZE_REGISTER> key(strKey);
-		std::cout<<"\nThe secret key is :"<<key;
-		/* set the secret key */
-		r1.setSecretKey(key);
-		r2.setSecretKey(key);
-		r3.setSecretKey(key);
-
-		/* Mix the secret key with the register. */
-		r1.mixSecretKey();
-		r2.mixSecretKey();
-		r3.mixSecretKey();
+		strKey = "0000000";
 	}
-#if 1
+
+	std::bitset<SIZE_SECRET> key(strKey);
+	std::cout<<"\nThe secret key is :"<<key;
+
+	/* set the secret key */
+	r1.setSecretKey(key);
+	r2.setSecretKey(key);
+	r3.setSecretKey(key);
+
+	/* define public key */
+	std::string pubKey = "10101010101010101"; // change is you like.
+	std::bitset<SIZE_PUBLIC> publicKey(pubKey);
+	
+	/* Mix the secret key with the register. */
+	r1.mixSecretAndPublicKey(publicKey);
+	r2.mixSecretAndPublicKey(publicKey);
+	r3.mixSecretAndPublicKey(publicKey);
+	
+	/* put these keys in registers. */
+	r1.mixKey();
+	r2.mixKey();
+	r3.mixKey();
+
+#if 0
 	/* Checking, if clock is working fine. */
 	//bool isThisClockHigh = r1.getClockBit();
 	//std::cout<<"\nPloy 1 :"<<poly1<<'\t'<<poly1[0]<<'\t'<<poly1[1]
 	//		<<'\t'<<poly1[2]<<'\t'<<poly1[3];
 #endif
-	
+
+	/* Now we have done all the nasty stuff with keys. Lets move on before
+	 * Jebberwalky gets us.
+	 */
+	int numFrames;
+	std::cout<<"\n==================================================="
+					 <<"\n==================================================="
+					 <<"\nGive the number of frames you want to produce.";
+	std::cin>>numFrames;
+
+	for(int i = 0; i < numFrames; i++)
+	{
+		if(1 == getMajority(&r1, &r2, &r3))	
+		{
+			r1.updateRegister();
+			r2.updateRegister();
+			std::cout<<"\nFrame "<<i<<" is :\n"
+				<<getFrame2(&r1, &r2);
+		}
+		if(4 == getMajority(&r1, &r2, &r3))
+		{
+			r1.updateRegister();
+			r2.updateRegister();
+			r3.updateRegister();
+			std::cout<<"\nFrame "<<i<<" is : \n"
+				<<getFrame3(&r1, &r3, &r3);
+		}
+		if(2 == getMajority(&r1, &r2, &r3))	
+		{
+			r1.updateRegister();
+			r3.updateRegister();
+			std::cout<<"\nFrame "<<i<<" is :\n"
+				<<getFrame2(&r1, &r2);
+		}
+		if(3 == getMajority(&r1, &r2, &r3))	
+		{
+			r2.updateRegister();
+			r3.updateRegister();
+			std::cout<<"\nFrame "<<i<<" is :\n"
+				<<getFrame2(&r1, &r2);
+		}
+
+	}
+
 	return EXIT_SUCCESS;
+}
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getMajority
+ *  Description:  get the majority.
+ *  Return : 
+ *  1 : 1 and 2 are clocked.
+ *  2 : 1 and 3 are clocked.
+ *  3 : 2 and 3 are clocked.
+ *  4 : all three are clocked.					
+ * =====================================================================================
+ */
+int getMajority(LFSR* pA, LFSR* pB, LFSR* pC)
+{
+	if(pA->getClockBit() == pB->getClockBit() && pA->getClockBit() == pC->getClockBit())
+		return 4;
+	if(pA->getClockBit() == pB->getClockBit() && pA->getClockBit() != pC->getClockBit())
+		return 1;
+	if(pA->getClockBit() != pB->getClockBit() && pA->getClockBit() == pC->getClockBit())
+		return 2;
+	if(pB->getClockBit() == pC->getClockBit() && pB->getClockBit() != pA->getClockBit())
+		return 3;
+	else
+		return 4; /* if something is not logical all are clocked. */
+}
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getFrame
+ *  Description:  This will give us the final frame.
+ * =====================================================================================
+ */
+std::bitset<SIZE_REGISTER> getFrame2(LFSR* pA, LFSR* pB)
+{
+
+#ifdef  DEBUG
+	std::cout<<"\nGetting the final frame 2. ";
+#else      /* -----  not DEBUG  ----- */
+
+#endif     /* -----  not DEBUG  ----- */
+	std::bitset<SIZE_REGISTER> finalFrame;
+	finalFrame = pA->getRegister() ^= pB->getRegister();
+#if 0
+	std::cout<<"\npA->regis: "<<pA->getRegister()<<"\tand Register is :"<<finalFrame;
+#endif
+	return finalFrame; 
+
+}
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getFrame
+ *  Description:  same as above but with three registers.
+ * =====================================================================================
+ */
+std::bitset<SIZE_REGISTER> getFrame3(LFSR* pA, LFSR* pB, LFSR* pC)
+{
+
+#ifdef  DEBUG
+	std::cout<<"\nGetting the final frame 3. ";
+#else      /* -----  not DEBUG  ----- */
+
+#endif     /* -----  not DEBUG  ----- */
+	std::bitset<SIZE_REGISTER> finalFrame;
+	finalFrame = pA->getRegister() ^= pB->getRegister() ^= pC->getRegister();
+#if 0
+	std::cout<<"\npA->regis: "<<pA->getRegister()<<"\tand Register is :"<<finalFrame;
+#endif
+	
+	return finalFrame; 
 }
 
 
