@@ -79,7 +79,16 @@ class LFSR
 		 *  Description:  This will get the Clock bit.
 		 * =====================================================================================
 		 */
-		std::bitset<1> getClockBit();
+		int getClockBitPos();
+
+
+		/* 
+		 * ===  FUNCTION  ======================================================================
+		 *         Name:  getClockBit
+		 *  Description:  get the value of clock bit.
+		 * =====================================================================================
+		 */
+		bool getClockBit();
 
 
 		/* ====================  MUTATORS      ======================================= */
@@ -90,7 +99,7 @@ class LFSR
 		 *  Description:  This will set the clock bit of this register.
 		 * =====================================================================================
 		 */
-		bool setClockBit(size_t pos);
+		bool setClockBit(int pos);
 	 
 		/* 
 		 * ===  FUNCTION  ======================================================================
@@ -100,7 +109,7 @@ class LFSR
 		 *  optional but we are going to use is anyway in our implementation.
 		 * =====================================================================================
 		 */
-		void setSecretKey(std::vector<bool> key);
+		void setSecretKey(std::bitset<SIZE_REGISTER> key);
 
 
 		/* 
@@ -111,7 +120,7 @@ class LFSR
 		 *  times.
 		 * =====================================================================================
 		 */
-		void initializeRegister(std::size_t num);
+		void initializeRegister();
 
 		
 		/* 
@@ -124,6 +133,15 @@ class LFSR
 
 		void mixSecretKey(void);
 
+
+		/* 
+		 * ===  FUNCTION  ======================================================================
+		 *         Name:  setPoly
+		 *  Description:  set the polynomial coefficient.
+		 * =====================================================================================
+		 */
+		void setPoly(void);
+
 		/* ====================  OPERATORS     ======================================= */
 
 		const LFSR& operator = ( const LFSR &other ); /* assignment operator */
@@ -133,9 +151,10 @@ class LFSR
 
 	private:
 
-		std::size_t posClockBit; 											//! position of the clock bit.
-		std::bitset<SIZE_REGISTER> Register; 					//! A register.
-		std::vector<bool> secretKey;									/**! A secret key to mix with the content
+		int posClockBit; 											//! position of the clock bit.
+		std::vector<unsigned int> coeffPoly;
+		std::bitset<SIZE_REGISTER> myRegister; 					//! A register.
+		std::bitset<SIZE_REGISTER> secretKey;									/**! A secret key to mix with the content
 																										 of the register.*/
 
 

@@ -63,3 +63,144 @@ LFSR::~LFSR()
 
 #endif     /* -----  not DEBUG  ----- */
 }
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  setClockBit
+ *  Description:  Lets set the clock bit
+ * =====================================================================================
+ */
+bool LFSR::setClockBit(int pos)
+{
+
+#ifdef  DEBUG
+	std::cout<<"\nSetting clock bit. \n";
+#else      /* -----  not DEBUG  ----- */
+
+#endif     /* -----  not DEBUG  ----- */
+	posClockBit = pos;
+	return EXIT_SUCCESS;
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getClockBitPos
+ *  Description:  get the value of clock bit.
+ * =====================================================================================
+ */
+int LFSR::getClockBitPos()
+{
+
+#ifdef  DEBUG
+	std::cout<<"\nGetting clock bit pos ... ";
+#else      /* -----  not DEBUG  ----- */
+
+#endif     /* -----  not DEBUG  ----- */
+	std::cout<<"\nPosition of clock bit is :"<<posClockBit;
+	return posClockBit;
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getClockBit
+ *  Description:  get whether clock bit is high of low.
+ * =====================================================================================
+ */
+bool LFSR::getClockBit()
+{
+
+#ifdef  DEBUG
+	std::cout<<"\nGetting the value of clock bit ...";
+#else      /* -----  not DEBUG  ----- */
+
+#endif     /* -----  not DEBUG  ----- */
+	return myRegister[posClockBit]; 
+}
+ 
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  initializeRegister()
+ *  Description:  This will initialize the register and put all the bits equal
+ *  to zero.
+ * =====================================================================================
+ */
+
+void LFSR::initializeRegister()
+{
+
+#ifdef  DEBUG
+	std::cout<<"\n Initializing a register ... \n";
+#else      /* -----  not DEBUG  ----- */
+
+#endif     /* -----  not DEBUG  ----- */
+
+	for(int i = 0; i < SIZE_REGISTER; i++)
+	{
+		myRegister[i] = 0;
+	}
+}
+
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  setSecretKey
+ *  Description:  see the header file.
+ * =====================================================================================
+ */
+
+void LFSR::setSecretKey(std::bitset<SIZE_REGISTER> key)
+{
+
+#ifdef  DEBUG
+	std::cout << "\nMixing the secret key ... \n";
+#endif     /* -----  not DEBUG  ----- */
+	for(int i = 0; i < SIZE_REGISTER; i++)
+	{
+		secretKey[i] = key[i];
+	}
+}
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  mixSecretKey()
+ *  Description:  This will mix the secret key in the register. Here we simply
+ *  copy it into the register.
+ * =====================================================================================
+ */
+
+void LFSR::mixSecretKey()
+{
+#ifdef  DEBUG
+	std::cout << "\nMixing the secret key with the register.";
+#endif     /* -----  not DEBUG  ----- */
+	for(int i = 0; i < SIZE_REGISTER; i++)
+	{
+		myRegister[i] = secretKey[i];
+	}
+}
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  setPoly
+ *  Description:  This will set the polynomial coefficient.
+ * =====================================================================================
+ */
+void LFSR::setPoly()
+{
+#ifdef  DEBUG
+	std::cout<<"\n Setting the polynomial coefficients ...\n";
+#endif     /* -----  not DEBUG  ----- */
+	int n; // number of the coeffcient;
+	std::cout<<"\nEnter the number of the coefficients: ";
+	std::cin >> n;
+	for(int i = 0; i < n; i++)
+	{
+		int num;
+		std::cout<<"\nEnter the "<<i+1<<" coefficient :";
+		std::cin >> num;
+		coeffPoly.push_back(num);
+	}
+}
+
